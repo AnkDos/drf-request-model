@@ -34,6 +34,8 @@ class RequestModelValidator:
             """"""
             self.request_data = None
             self.error_data = defaultdict(set)
+            self.json_segment = {}
+            self.model_segment = {}
             request = args[1]
             if request.method == 'GET':
                 self.request_data = request.query_params
@@ -47,11 +49,12 @@ class RequestModelValidator:
                     self.validate_querydict(
                         key, value, self.request_data.get(key))
             else:
-                json_segment = self.validate_json(self.request_data)
-                model_segment = self.break_model(self.model)
-                self.detect_unnecessary_keys_json(json_segment, model_segment)
-                for key, value in model_segment.items():
-                    self.validate_request(key, value, json_segment.get(key))
+                self.break_json(self.request_data)
+                self.break_model(self.model)
+                print(self.json_segment, self.model_segment)
+                self.detect_unnecessary_keys_json()
+                for key, value in self.model_segment.items():
+                    self.validate_request(key, value, self.json_segment.get(key))
             if self.error_data:
                 raise Exception(f"Invalid Request {self.error_data}")
             return func(*args)
@@ -66,11 +69,11 @@ class RequestModelValidator:
         if unnecessary_key:
             raise Exception(f"Un-necessary Keys Present {unnecessary_key}")
     
-    def detect_unnecessary_keys_json(self, json_segment, model_segment):
+    def detect_unnecessary_keys_json(self):
         """"""
         unnecessary_key = set()
-        for key, value in json_segment.items():
-            if key not in model_segment:
+        for key, value in self.json_segment.items():
+            if key not in self.model_segment:
                 unnecessary_key.add(key)
         if unnecessary_key:
             raise Exception(f"Un-necessary Keys Present {unnecessary_key}")
@@ -97,23 +100,17 @@ class RequestModelValidator:
                 self.error_data['regexValidationFailed'].add(key)
                 return
     
-    def validate_json(self, request_value, json_segment={}):
+    def break_json(self, request_value):
         """"""
-        if not json_segment:
-            json_segment = {}
         for key_, value_ in request_value.items():
-            json_segment[key_] = value_
+            self.json_segment[key_] = value_
             if isinstance(value_, dict):
-                return self.validate_json(value_)
-        return json_segment
+                return self.break_json(value_)
+        
     
-    def break_model(self, model, model_segment={}):
+    def break_model(self, model):
         """"""
-        if not model_segment:
-            model_segment = {}
         for key_, value_ in model.items():
-            model_segment[key_] = value_
+            self.model_segment[key_] = value_
             if value_.nested:
                 return self.break_model(value_.nested)
-        return model_segment
-        

@@ -16,7 +16,7 @@ query_param_model_example = {
 simple_json_model_example = {
     "name": RequestModel(data_type=str, regex="^[a-zA-Z][a-zA-Z\' .,-]+[a-zA-Z]$"),
     "marks": RequestModel(data_type=list, required=False),
-    "address": RequestModel(data_type=dict)
+    "address": RequestModel(data_type=list)
 }
 
 nested_json_model_example = {
@@ -24,6 +24,8 @@ nested_json_model_example = {
     "marks": RequestModel(data_type=list, required=False),
     "address": RequestModel(data_type=dict, 
                                     nested={"street":RequestModel(data_type=str),
-                                            "pincodes":  RequestModel(data_type=list, required=False),
-                                            "corraddr": RequestModel(data_type=dict, nested={"street2": RequestModel(data_type=str)})})
+                                            "pincodes":  RequestModel(data_type=list),
+                                            "corraddr": RequestModel(data_type=dict, nested={"street2": RequestModel(data_type=str , nested={"ank": RequestModel(data_type=int)})})
+                        
+                                            })
 }
