@@ -51,7 +51,7 @@ class RequestModelValidator:
             else:
                 self.break_json(self.request_data)
                 self.break_model(self.model)
-                print(self.json_segment, self.model_segment)
+                
                 self.detect_unnecessary_keys_json()
                 for key, value in self.model_segment.items():
                     self.validate_request(key, value, self.json_segment.get(key))
