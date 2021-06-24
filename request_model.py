@@ -22,11 +22,12 @@ class RequestModel:
 class RequestModelValidator:
     """"""
 
-    def __init__(self, model):
+    def __init__(self, model, type_=None):
         """"""
         self.model = model
         self.request_data = None
         self.error_data = None
+        self.type = type_
 
     def __call__(self, func):
         """"""
@@ -37,13 +38,13 @@ class RequestModelValidator:
             self.error_data = defaultdict(set)
             self.unnecessary_keys_json = set()
             request = args[1]
-            if request.method == 'GET':
+            if self.type == 'query_params':
                 self.request_data = request.query_params
             else:
                 self.request_data = request.data
 
             self.request_data = dict(self.request_data)
-            if 'application/json' not in request.headers.get('Content-type', ''):
+            if 'application/json' not in request.headers.get('Content-type', '') or self.type == 'query_params':
                 self.detect_unnecessary_keys()
                 for key, value in self.model.items():
                     self.validate_querydict(
@@ -85,7 +86,7 @@ class RequestModelValidator:
             if not isinstance(request_value, model_value.data_type):
                 self.error_data['invalidDatatype'].add(key)
                 return
-        if model_value.regex:
+        if model_value.regex and request_value:
             if not re.match(re.compile(model_value.regex), request_value):
                 self.error_data['regexValidationFailed'].add(key)
                 return
