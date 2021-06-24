@@ -1,5 +1,5 @@
 # drf-request-model
-A request model decorator to validate the request at DRF APIView 
+A request model decorator to validate the request payload at DRF APIView 
 
 # Usage : 
 
