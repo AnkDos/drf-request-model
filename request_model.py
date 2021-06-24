@@ -81,15 +81,15 @@ class RequestModelValidator:
         """"""
         if model_value.required and request_value is None:
             self.error_data['requiredValueMissing'].add(key)
-            return
+            
         if request_value is not None:
             if not isinstance(request_value, model_value.data_type):
                 self.error_data['invalidDatatype'].add(key)
-                return
+                
         if model_value.regex and request_value:
             if not re.match(re.compile(model_value.regex), request_value):
                 self.error_data['regexValidationFailed'].add(key)
-                return
+                
 
     def validate_json(self, request_data, model):
         """"""
