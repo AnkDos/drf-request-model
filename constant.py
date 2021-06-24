@@ -32,3 +32,7 @@ nested_json_model_example = {
     "nk": RequestModel(data_type=str),
     "ta": RequestModel(data_type=dict, nested={"cool": RequestModel(data_type=bool) ,"aa": RequestModel(data_type=list)})
 }
+
+payload_query_param = {
+    "a": RequestModel(data_type=str, required=False)
+}
