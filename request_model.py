@@ -103,6 +103,7 @@ class RequestModelValidator:
         for key, value in request_data.items():
             if not model.get(key):
                 self.unnecessary_keys_json.add(key)
+                continue
             if isinstance(value, dict):
                 self.detect_unnecessary_keys_json(request_data.get(key), model.get(key).nested)
 
